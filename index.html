@@ -22,7 +22,7 @@ const img = new Image();
 img.src = "https://raw.githubusercontent.com/uhcaribe/0212/main/character/run.png";
 
 img.onload = () => {
-  console.log("imagen cargada", img.width, img.height);
+  console.log("img size:", img.width, img.height);
   ctx.fillStyle = "red";
   ctx.fillRect(0, 0, 50, 50); // debug visual
 
