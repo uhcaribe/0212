@@ -13,12 +13,19 @@
 <canvas id="game" width="800" height="400"></canvas>
 
 <script>
+console.log("JS cargado");
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 // --- SPRITE ---
 const runSheet = new Image();
 runSheet.src = "https://raw.githubusercontent.com/uhcaribe/0212/main/character/run.png";
+runSheet.onload = loop;
+runSheet.onerror = () => {
+console.log("ERROR: no se pudo cargar el sprite");
+};
+
 
 // --- CONFIG ---
 const FRAME_COUNT = 6;
