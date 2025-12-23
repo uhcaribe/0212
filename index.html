@@ -93,7 +93,6 @@ function loop() {
 if (inAir) {
   img = jumpImg;
   frameW = img.width / JUMP_FRAMES;
-  drawH = JUMP_DRAW_H;
 
   jumpTimer++;
   if (jumpTimer > JUMP_SPEED) {
@@ -129,7 +128,8 @@ if (inAir) {
     player.x,
     drawY,
     player.drawW,
-    drawH
+    DRAW_H
+
   );
 
   requestAnimationFrame(loop);
