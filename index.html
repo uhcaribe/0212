@@ -115,9 +115,8 @@ function loop() {
     jumpFrame = 0;
   }
 
-  /* ajuste para que los pies queden en el piso */
-  const drawY = player.y - drawH + 10; // 10 es opcional, margen para alinear pies
-
+  /* dibujar sprite sin aplastar */
+  const drawY = player.y - drawH; // usamos la altura real del sprite
 
   ctx.drawImage(
     img,
