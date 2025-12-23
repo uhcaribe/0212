@@ -4,31 +4,59 @@
   <meta charset="UTF-8" />
   <title>0212</title>
   <style>
-    body { margin: 0; overflow: hidden; background: black; }
-    canvas { display: block; margin: auto; }
+    body { margin: 0; background: #000; }
+    canvas { display: block; margin: auto; background: #111; }
   </style>
 </head>
 <body>
-  <canvas id="game" width="800" height="400"></canvas>
 
-  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+<canvas id="game" width="800" height="400"></canvas>
 
-    const playerImg = new Image();
-    playerImg.src = "PEGA_AQUI_LA_URL_DEL_PNG";
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-    let x = 100;
-    let y = 280;
+// --- SPRITE ---
+const runSheet = new Image();
+runSheet.src = "./character/run.png";
 
-    function loop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(playerImg, x, y, 64, 64);
-      requestAnimationFrame(loop);
-    }
+// --- CONFIG ---
+const FRAME_COUNT = 6;
+const FRAME_WIDTH = 256;   // AJUSTA si es distinto
+const FRAME_HEIGHT = 256;
 
-    playerImg.onload = loop;
-  </script>
+let frame = 0;
+let tick = 0;
+
+// --- PLAYER ---
+const player = {
+  x: 100,
+  y: 250,
+  w: 96,
+  h: 96
+};
+
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  tick++;
+  if (tick % 6 === 0) {
+    frame = (frame + 1) % FRAME_COUNT;
+  }
+
+  ctx.drawImage(
+    runSheet,
+    frame * FRAME_WIDTH, 0,
+    FRAME_WIDTH, FRAME_HEIGHT,
+    player.x, player.y,
+    player.w, player.h
+  );
+
+  requestAnimationFrame(loop);
+}
+
+runSheet.onload = loop;
+</script>
+
 </body>
 </html>
-
