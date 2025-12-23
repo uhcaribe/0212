@@ -116,7 +116,8 @@ function loop() {
   }
 
   /* ajuste para que los pies queden en el piso */
-  const drawY = player.y - (drawH - RUN_DRAW_H);
+  const drawY = player.y - drawH + 10; // 10 es opcional, margen para alinear pies
+
 
   ctx.drawImage(
     img,
