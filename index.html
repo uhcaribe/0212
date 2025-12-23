@@ -32,7 +32,7 @@ const ctx = canvas.getContext("2d");
    SPRITE
 ===================== */
 const img = new Image();
-img.src = "https://raw.githubusercontent.com/uhcaribe/0212/main/character/run.png";
+img.src = "./character/run.png";
 
 const FRAMES = 6;
 let frame = 0;
@@ -71,6 +71,7 @@ function loop() {
     sprite.drawWidth,
     sprite.drawHeight
   );
+
 
   requestAnimationFrame(loop);
 }
