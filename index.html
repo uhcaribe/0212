@@ -22,10 +22,6 @@
 <canvas id="game" width="800" height="400"></canvas>
 
 <script>
-  window.addEventListener("keydown", e => {
-  console.log(e.code);
-});
-
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -36,17 +32,20 @@ runImg.src = "./character/run.png";
 const jumpImg = new Image();
 jumpImg.src = "./character/jump.png";
 
-/* ========= PLAYER ========= */
+/* ========= CONSTANTES ========= */
 const FRAMES = 6;
-let frame = 0;
-let timer = 0;
-
 const JUMP_FRAMES = 8;
-let jumpFrame = 0;
-let jumpTimer = 0;
 const JUMP_SPEED = 5;
 
+const RUN_DRAW_H = 96;
+const JUMP_DRAW_H = 120; // AJUSTA SI QUIERES
 
+let frame = 0;
+let timer = 0;
+let jumpFrame = 0;
+let jumpTimer = 0;
+
+/* ========= PLAYER ========= */
 const player = {
   x: 80,
   y: 0,
@@ -55,7 +54,6 @@ const player = {
   jumpForce: -18,
   ground: canvas.height - 110,
   drawW: 96,
-  drawH: 96,
   jumping: false
 };
 
@@ -88,11 +86,12 @@ function loop() {
   }
 
   /* animación */
-  let img, frameW, currentFrame;
+  let img, frameW, currentFrame, drawH;
 
   if (player.jumping) {
     img = jumpImg;
     frameW = img.width / JUMP_FRAMES;
+    drawH = JUMP_DRAW_H;
 
     jumpTimer++;
     if (jumpTimer > JUMP_SPEED) {
@@ -104,6 +103,7 @@ function loop() {
   } else {
     img = runImg;
     frameW = img.width / FRAMES;
+    drawH = RUN_DRAW_H;
 
     timer++;
     if (timer > 6) {
@@ -115,6 +115,9 @@ function loop() {
     jumpFrame = 0;
   }
 
+  /* ajuste para que los pies queden en el piso */
+  const drawY = player.y - (drawH - RUN_DRAW_H);
+
   ctx.drawImage(
     img,
     currentFrame * frameW,
@@ -122,9 +125,9 @@ function loop() {
     frameW,
     img.height,
     player.x,
-    player.y,
+    drawY,
     player.drawW,
-    player.drawH
+    drawH
   );
 
   requestAnimationFrame(loop);
@@ -139,3 +142,4 @@ runImg.onload = () => {
 
 </body>
 </html>
+
