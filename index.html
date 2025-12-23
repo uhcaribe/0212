@@ -41,6 +41,12 @@ const FRAMES = 6;
 let frame = 0;
 let timer = 0;
 
+const JUMP_FRAMES = 8;
+let jumpFrame = 0;
+let jumpTimer = 0;
+const JUMP_SPEED = 5;
+
+
 const player = {
   x: 80,
   y: 0,
@@ -71,6 +77,7 @@ canvas.addEventListener("click", jump);
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  /* física */
   player.vy += player.gravity;
   player.y += player.vy;
 
@@ -80,24 +87,40 @@ function loop() {
     player.jumping = false;
   }
 
-  if (!player.jumping) {
+  /* animación */
+  let img, frameW, currentFrame;
+
+  if (player.jumping) {
+    img = jumpImg;
+    frameW = img.width / JUMP_FRAMES;
+
+    jumpTimer++;
+    if (jumpTimer > JUMP_SPEED) {
+      jumpFrame = (jumpFrame + 1) % JUMP_FRAMES;
+      jumpTimer = 0;
+    }
+
+    currentFrame = jumpFrame;
+  } else {
+    img = runImg;
+    frameW = img.width / FRAMES;
+
     timer++;
     if (timer > 6) {
       frame = (frame + 1) % FRAMES;
       timer = 0;
     }
-  }
 
-  const img = player.jumping ? jumpImg : runImg;
-  const frameW = player.jumping ? img.width : img.width / FRAMES;
-  const frameH = img.height;
+    currentFrame = frame;
+    jumpFrame = 0;
+  }
 
   ctx.drawImage(
     img,
-    player.jumping ? 0 : frame * frameW,
+    currentFrame * frameW,
     0,
     frameW,
-    frameH,
+    img.height,
     player.x,
     player.y,
     player.drawW,
