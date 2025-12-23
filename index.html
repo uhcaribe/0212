@@ -86,12 +86,11 @@ function loop() {
   }
 
   /* animación */
-  let img, frameW, currentFrame, drawH;
+  let img, frameW, currentFrame;
 
   if (player.jumping) {
     img = jumpImg;
     frameW = img.width / JUMP_FRAMES;
-    drawH = JUMP_DRAW_H;
 
     jumpTimer++;
     if (jumpTimer > JUMP_SPEED) {
@@ -103,7 +102,6 @@ function loop() {
   } else {
     img = runImg;
     frameW = img.width / FRAMES;
-    drawH = RUN_DRAW_H;
 
     timer++;
     if (timer > 6) {
@@ -115,8 +113,10 @@ function loop() {
     jumpFrame = 0;
   }
 
-  /* dibujar sprite sin aplastar */
-  const drawY = player.y - drawH; // usamos la altura real del sprite
+  /* escala proporcional para que no se aplaste */
+  const scale = player.drawW / frameW;
+  const drawHScaled = img.height * scale;
+  const drawY = player.y - drawHScaled;
 
   ctx.drawImage(
     img,
@@ -127,7 +127,7 @@ function loop() {
     player.x,
     drawY,
     player.drawW,
-    drawH
+    drawHScaled
   );
 
   requestAnimationFrame(loop);
