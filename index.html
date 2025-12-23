@@ -82,41 +82,43 @@ function loop() {
   if (player.y >= player.ground) {
     player.y = player.ground;
     player.vy = 0;
-    player.jumping = false;
+
+  const inAir = player.y < player.ground;
+
   }
 
   /* animación */
   let img, frameW, currentFrame, drawH;
 
-  if (player.jumping) {
-    img = jumpImg;
-    frameW = img.width / JUMP_FRAMES;
-    drawH = JUMP_DRAW_H;
+if (inAir) {
+  img = jumpImg;
+  frameW = img.width / JUMP_FRAMES;
+  drawH = JUMP_DRAW_H;
 
-    jumpTimer++;
-    if (jumpTimer > JUMP_SPEED) {
-      jumpFrame = (jumpFrame + 1) % JUMP_FRAMES;
-      jumpTimer = 0;
-    }
-
-    currentFrame = jumpFrame;
-  } else {
-    img = runImg;
-    frameW = img.width / FRAMES;
-    drawH = RUN_DRAW_H;
-
-    timer++;
-    if (timer > 6) {
-      frame = (frame + 1) % FRAMES;
-      timer = 0;
-    }
-
-    currentFrame = frame;
-    jumpFrame = 0;
+  jumpTimer++;
+  if (jumpTimer > JUMP_SPEED) {
+    jumpFrame = (jumpFrame + 1) % JUMP_FRAMES;
+    jumpTimer = 0;
   }
 
+  currentFrame = jumpFrame;
+} else {
+  img = runImg;
+  frameW = img.width / FRAMES;
+  drawH = RUN_DRAW_H;
+
+  timer++;
+  if (timer > 6) {
+    frame = (frame + 1) % FRAMES;
+    timer = 0;
+  }
+
+  currentFrame = frame;
+  jumpFrame = 0;
+}
+
   /* ajuste para que los pies queden en el piso */
-  const drawY = player.y - (drawH - RUN_DRAW_H);
+  const drawY = player.ground - drawH;
 
   ctx.drawImage(
     img,
