@@ -1,63 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Runner 0212</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    canvas {
-      background: #1a1a1a;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Runner con salto por webcam</title>
+<style>
+  body {
+    margin: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  canvas {
+    background: #1a1a1a;
+  }
+  video {
+    display: none;
+  }
+</style>
 </head>
 <body>
 
 <canvas id="game" width="800" height="400"></canvas>
+<video id="video" width="640" height="480" autoplay></video>
 
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+<script type="module">
+import {Pose} from 'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js';
+import {Camera} from 'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js';
 
-/* ========= ASSETS ========= */
+// ====== ASSETS ======
 const runImg = new Image();
-runImg.src = "./character/run.png";
-
+runImg.src = './character/run.png';
 const jumpImg = new Image();
-jumpImg.src = "./character/jump.png";
+jumpImg.src = './character/jump.png';
 
-/* ========= CONSTANTES ========= */
+// ====== CONSTANTES ======
 const FRAMES = 6;
 const JUMP_FRAMES = 8;
 const JUMP_SPEED = 5;
-
 const RUN_DRAW_H = 96;
-const JUMP_DRAW_H = 120; // AJUSTA SI QUIERES
+const JUMP_DRAW_H = 120;
 
-let frame = 0;
-let timer = 0;
-let jumpFrame = 0;
-let jumpTimer = 0;
-
-/* ========= PLAYER ========= */
+// ====== PLAYER ======
 const player = {
   x: 80,
   y: 0,
   vy: 0,
   gravity: 1.2,
   jumpForce: -18,
-  ground: canvas.height - 50,
-  drawW: 180,
+  ground: canvas.height - 70,
+  drawW: 150,
   jumping: false
 };
 
-/* ========= INPUT ========= */
+// ====== INPUT ======
 function jump() {
   if (!player.jumping) {
     player.vy = player.jumpForce;
@@ -65,55 +63,79 @@ function jump() {
   }
 }
 
-window.addEventListener("keydown", e => {
-  if (e.code === "Space") jump();
-});
-
+window.addEventListener("keydown", e => { if(e.code === 'Space') jump(); });
 canvas.addEventListener("click", jump);
 
-/* ========= LOOP ========= */
-function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+// ====== WEBCAM + POSE ======
+const videoElement = document.getElementById('video');
+let lastHipY = null;
 
-  /* física */
+const pose = new Pose({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`});
+pose.setOptions({modelComplexity: 1, smoothLandmarks: true});
+pose.onResults(onPose);
+
+function onPose(results) {
+  if (!results.poseLandmarks) return;
+
+  const hipY = results.poseLandmarks[23].y; // cadera izquierda
+  if (lastHipY !== null) {
+    // si la cadera sube lo suficiente -> salto
+    if (lastHipY - hipY > 0.05) {
+      jump();
+    }
+  }
+  lastHipY = hipY;
+}
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => { await pose.send({image: videoElement}); },
+  width: 640,
+  height: 480
+});
+camera.start();
+
+// ====== GAME LOOP ======
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let frame = 0;
+let timer = 0;
+let jumpFrame = 0;
+let jumpTimer = 0;
+
+function loop() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // física
   player.vy += player.gravity;
   player.y += player.vy;
-
-  if (player.y >= player.ground) {
+  if(player.y >= player.ground){
     player.y = player.ground;
     player.vy = 0;
     player.jumping = false;
   }
 
-  /* animación */
+  // animación
   let img, frameW, currentFrame;
-
-  if (player.jumping) {
+  if(player.jumping){
     img = jumpImg;
     frameW = img.width / JUMP_FRAMES;
-
     jumpTimer++;
-    if (jumpTimer > JUMP_SPEED) {
-      jumpFrame = (jumpFrame + 1) % JUMP_FRAMES;
-      jumpTimer = 0;
-    }
-
+    if(jumpTimer > JUMP_SPEED){ jumpFrame = (jumpFrame + 1) % JUMP_FRAMES; jumpTimer=0; }
     currentFrame = jumpFrame;
   } else {
     img = runImg;
     frameW = img.width / FRAMES;
-
     timer++;
-    if (timer > 4) {
-      frame = (frame + 1) % FRAMES;
-      timer = 0;
+    if(timer > 3){ // animación más rápida
+      frame = (frame+1) % FRAMES;
+      timer=0;
     }
-
     currentFrame = frame;
-    jumpFrame = 0;
+    jumpFrame=0;
   }
 
-  /* escala proporcional para que no se aplaste */
+  // escala proporcional
   const scale = player.drawW / frameW;
   const drawHScaled = img.height * scale;
   const drawY = player.y - drawHScaled;
@@ -133,11 +155,7 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-/* ========= START ========= */
-runImg.onload = () => {
-  player.y = player.ground;
-  loop();
-};
+runImg.onload = () => { player.y = player.ground; loop(); };
 </script>
 
 </body>
