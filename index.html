@@ -82,7 +82,7 @@ function loop() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   // DIBUJAR CAPAS DE FONDO
-  bgX = drawLayer(bgBack, bgX, 1.5);
+  bgX = drawLayer(bgBack, bgX, 1);
   mid1X = drawLayer(bgMid1, mid1X, 3);
 
   // FÍSICA
@@ -106,7 +106,7 @@ function loop() {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if(timer > 4){ frame = (frame+1) % FRAMES; timer=0; } // velocidad 4
+    if(timer > 5){ frame = (frame+1) % FRAMES; timer=0; } // velocidad 4
     currentFrame = frame;
     jumpFrame=0;
   }
@@ -130,8 +130,8 @@ function loop() {
   );
 
   // Continuar con capas más cercanas
-  mid2X = drawLayer(bgMid2, mid2X, 4);
-  fgX = drawLayer(fgFront, fgX, 5);
+  mid2X = drawLayer(bgMid2, mid2X, 3);
+  fgX = drawLayer(fgFront, fgX, 4);
 
   // TODO: dibujar obstáculos aquí
 
