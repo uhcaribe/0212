@@ -48,7 +48,7 @@ const player = {
   vy: 0,
   gravity: 1.2,
   jumpForce: -18,
-  ground: canvas.height - 70,
+  ground: canvas.height - 50,
   drawW: 200,      // personaje más grande
   jumping: false
 };
@@ -93,7 +93,7 @@ function loop() {
 
   // DIBUJAR CAPAS DE FONDO
   bgX = drawLayer(bgBack, bgX, 1, bgBackWidth);
-  mid1X = drawLayer(bgMid1, mid1X, 2, bgMid1Width);
+  mid1X = drawLayer(bgMid1, mid1X, 3, bgMid1Width);
 
   // FÍSICA DEL JUGADOR
   player.vy += player.gravity;
