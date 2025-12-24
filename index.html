@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Runner 0212 con Parallax y Ancho Real</title>
+<title>Runner 0212 con Parallax y Gap</title>
 <style>
   body {
     margin: 0;
@@ -23,13 +23,13 @@
 <canvas id="game" width="800" height="400"></canvas>
 
 <script>
-// ====== ASSETS ======
+// ====== IMÁGENES ======
 const runImg = new Image(); runImg.src = './character/run.png';
 const jumpImg = new Image(); jumpImg.src = './character/jump.png';
 
-// Capas de ciudad
 const bgBack = new Image(); bgBack.src = './environment/background.PNG';
-const bgMid1 = new Image(); bgMid1.src = './environment/midground1.PNG';
+const mid1A = new Image(); mid1A.src = './environment/midground1A.PNG';
+const mid1B = new Image(); mid1B.src = './environment/midground1B.PNG';
 const bgMid2 = new Image(); bgMid2.src = './environment/midground2.PNG';
 const fgFront = new Image(); fgFront.src = './environment/foreground.PNG';
 
@@ -48,8 +48,8 @@ const player = {
   vy: 0,
   gravity: 1.2,
   jumpForce: -18,
-  ground: canvas.height - 60,
-  drawW: 200,      // personaje más grande
+  ground: canvas.height - 70,
+  drawW: 200,
   jumping: false
 };
 
@@ -67,33 +67,49 @@ canvas.addEventListener("click", jump);
 // ====== ANIMACIÓN ======
 let frame = 0, timer = 0, jumpFrame = 0, jumpTimer = 0;
 
-// ====== CAPAS DE FONDO (con ancho real) ======
-let bgX=0, mid1X=0, mid2X=0, fgX=0;
-const bgBackWidth = bgBack.width;
-const bgMid1Width = bgMid1.width;
-const bgMid2Width = bgMid2.width;
-const fgFrontWidth = fgFront.width;
+// ====== CAPAS DE FONDO ======
+let bgX = 0;
 
-function drawLayer(img, x, speed) {
-  const scale = canvas.height / img.height;       // escalar según altura
-  const width = img.width * scale;               // ancho proporcional
+// Midground1 con dos copias consecutivas
+let mid1AX = 0;
+let mid1BX = 0;
 
-  ctx.drawImage(img, x, 0, width, canvas.height);
-  ctx.drawImage(img, x + width, 0, width, canvas.height);
+// Midground2 con gap
+let mid2X = 0;
+const mid2Gap = 400;
 
-  x -= speed;
-  if (x <= -width) x = 0;
-  return x;
+// Foreground
+let fgX = 0;
+
+// Escalado proporcional por altura
+function getScaledWidth(img) {
+  const scale = canvas.height / img.height;
+  return img.width * scale;
 }
-
 
 // ====== LOOP PRINCIPAL ======
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // DIBUJAR CAPAS DE FONDO
-  bgX = drawLayer(bgBack, bgX, 1, bgBackWidth);
-  mid1X = drawLayer(bgMid1, mid1X, 3, bgMid1Width);
+  // Background
+  const bgWidth = getScaledWidth(bgBack);
+  ctx.drawImage(bgBack, bgX, 0, bgWidth, canvas.height);
+  ctx.drawImage(bgBack, bgX + bgWidth, 0, bgWidth, canvas.height);
+  bgX -= 0.5;
+  if (bgX <= -bgWidth) bgX = 0;
+
+  // Midground1A y Midground1B
+  const mid1Width = getScaledWidth(mid1A);
+  if (!mid1BX) mid1BX = mid1AX + mid1Width;
+
+  ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
+  ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
+
+  mid1AX -= 1; 
+  mid1BX -= 1;
+
+  if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
+  if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
   // FÍSICA DEL JUGADOR
   player.vy += player.gravity;
@@ -116,7 +132,7 @@ function loop() {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if (timer > 5) { frame = (frame + 1) % FRAMES; timer = 0; }
+    if (timer > 4) { frame = (frame + 1) % FRAMES; timer = 0; }
     currentFrame = frame;
     jumpFrame = 0;
   }
@@ -128,11 +144,18 @@ function loop() {
   // DIBUJAR AL PERSONAJE ENTRE mid1 y mid2
   ctx.drawImage(img, currentFrame * frameW, 0, frameW, img.height, player.x, drawY, player.drawW, drawHScaled);
 
-  // Capas más cercanas
-  mid2X = drawLayer(bgMid2, mid2X, 2, bgMid2Width);
-  fgX = drawLayer(fgFront, fgX, 3, fgFrontWidth);
+  // Midground2 con gap
+  const mid2Width = getScaledWidth(bgMid2);
+  ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
+  mid2X -= 2;
+  if (mid2X <= -mid2Width - mid2Gap) mid2X = canvas.width + mid2Gap;
 
-  // TODO: dibujar obstáculos aquí
+  // Foreground
+  const fgWidth = getScaledWidth(fgFront);
+  ctx.drawImage(fgFront, fgX, 0, fgWidth, canvas.height);
+  ctx.drawImage(fgFront, fgX + fgWidth, 0, fgWidth, canvas.height);
+  fgX -= 3;
+  if (fgX <= -fgWidth) fgX = 0;
 
   requestAnimationFrame(loop);
 }
