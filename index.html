@@ -74,13 +74,18 @@ const bgMid1Width = bgMid1.width;
 const bgMid2Width = bgMid2.width;
 const fgFrontWidth = fgFront.width;
 
-function drawLayer(img, x, speed, width) {
+function drawLayer(img, x, speed) {
+  const scale = canvas.height / img.height;       // escalar según altura
+  const width = img.width * scale;               // ancho proporcional
+
   ctx.drawImage(img, x, 0, width, canvas.height);
   ctx.drawImage(img, x + width, 0, width, canvas.height);
+
   x -= speed;
   if (x <= -width) x = 0;
   return x;
 }
+
 
 // ====== LOOP PRINCIPAL ======
 function loop() {
