@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Runner 0212 con Parallax y Gap</title>
+<title>Runner 0212 Corregido</title>
 <style>
   body {
     margin: 0;
@@ -60,7 +60,6 @@ function jump() {
     player.jumping = true;
   }
 }
-
 window.addEventListener("keydown", e => { if(e.code === 'Space') jump(); });
 canvas.addEventListener("click", jump);
 
@@ -69,16 +68,10 @@ let frame = 0, timer = 0, jumpFrame = 0, jumpTimer = 0;
 
 // ====== CAPAS DE FONDO ======
 let bgX = 0;
-
-// Midground1 con dos copias consecutivas
 let mid1AX = 0;
 let mid1BX = 0;
-
-// Midground2 con gap
 let mid2X = 0;
 const mid2Gap = 400;
-
-// Foreground
 let fgX = 0;
 
 // Escalado proporcional por altura
@@ -95,19 +88,16 @@ function loop() {
   const bgWidth = getScaledWidth(bgBack);
   ctx.drawImage(bgBack, bgX, 0, bgWidth, canvas.height);
   ctx.drawImage(bgBack, bgX + bgWidth, 0, bgWidth, canvas.height);
-  bgX -= 0.5;
+  bgX -= 1;
   if (bgX <= -bgWidth) bgX = 0;
 
   // Midground1A y Midground1B
   const mid1Width = getScaledWidth(mid1A);
-  if (!mid1BX) mid1BX = mid1AX + mid1Width;
-
   ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
   ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
 
-  mid1AX -= 1; 
-  mid1BX -= 1;
-
+  mid1AX -= 3;
+  mid1BX -= 3;
   if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
   if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
@@ -132,7 +122,7 @@ function loop() {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if (timer > 4) { frame = (frame + 1) % FRAMES; timer = 0; }
+    if (timer > 5) { frame = (frame + 1) % FRAMES; timer = 0; }
     currentFrame = frame;
     jumpFrame = 0;
   }
@@ -141,28 +131,44 @@ function loop() {
   const drawHScaled = img.height * scale;
   const drawY = player.y - drawHScaled;
 
-  // DIBUJAR AL PERSONAJE ENTRE mid1 y mid2
+  // DIBUJAR AL PERSONAJE ENTRE mid1 Y mid2
   ctx.drawImage(img, currentFrame * frameW, 0, frameW, img.height, player.x, drawY, player.drawW, drawHScaled);
 
   // Midground2 con gap
   const mid2Width = getScaledWidth(bgMid2);
   ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
-  mid2X -= 2;
+  mid2X -= 3;
   if (mid2X <= -mid2Width - mid2Gap) mid2X = canvas.width + mid2Gap;
 
   // Foreground
   const fgWidth = getScaledWidth(fgFront);
   ctx.drawImage(fgFront, fgX, 0, fgWidth, canvas.height);
   ctx.drawImage(fgFront, fgX + fgWidth, 0, fgWidth, canvas.height);
-  fgX -= 3;
+  fgX -= 4;
   if (fgX <= -fgWidth) fgX = 0;
 
   requestAnimationFrame(loop);
 }
 
-// START
-runImg.onload = () => { player.y = player.ground; loop(); };
+// ====== ESPERAR CARGA DE TODAS LAS IMÁGENES ======
+const images = [runImg, jumpImg, bgBack, mid1A, mid1B, bgMid2, fgFront];
+let loaded = 0;
+images.forEach(img => {
+  img.onload = () => {
+    loaded++;
+    if (loaded === images.length) startGame();
+  };
+});
+
+function startGame() {
+  player.y = player.ground;
+  mid1AX = 0;
+  mid1BX = getScaledWidth(mid1A);
+  mid2X = canvas.width;
+  loop();
+}
 </script>
 
 </body>
 </html>
+
