@@ -110,7 +110,7 @@ function loop() {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if(timer > 2){ frame = (frame+1) % FRAMES; timer=0; } // más rápido
+    if(timer > 8){ frame = (frame+1) % FRAMES; timer=0; } // más rápido
     currentFrame = frame;
     jumpFrame=0;
   }
