@@ -144,7 +144,7 @@ function loop() {
   const fgWidth = getScaledWidth(fgFront);
   ctx.drawImage(fgFront, fgX, 0, fgWidth, canvas.height);
   ctx.drawImage(fgFront, fgX + fgWidth, 0, fgWidth, canvas.height);
-  fgX -= 3.2;
+  fgX -= 3.5;
   if (fgX <= -fgWidth) fgX = 0;
 
   requestAnimationFrame(loop);
