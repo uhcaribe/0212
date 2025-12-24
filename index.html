@@ -96,8 +96,8 @@ function loop() {
   ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
   ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
 
-  mid1AX -= 3;
-  mid1BX -= 3;
+  mid1AX -= 2.5;
+  mid1BX -= 2.5;
   if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
   if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
@@ -137,7 +137,7 @@ function loop() {
   // Midground2 con gap
   const mid2Width = getScaledWidth(bgMid2);
   ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
-  mid2X -= 3;
+  mid2X -= 2.5;
   if (mid2X <= -mid2Width - mid2Gap) mid2X = canvas.width + mid2Gap;
 
   // Foreground
