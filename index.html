@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Runner 0212 con Parallax</title>
+<title>Runner 0212 con Parallax y personaje más grande</title>
 <style>
   body {
     margin: 0;
@@ -37,8 +37,6 @@ const fgFront = new Image(); fgFront.src = './environment/foreground.PNG';
 const FRAMES = 6;
 const JUMP_FRAMES = 8;
 const JUMP_SPEED = 5;
-const RUN_DRAW_H = 96;
-const JUMP_DRAW_H = 120;
 
 // ====== PLAYER ======
 const canvas = document.getElementById("game");
@@ -51,7 +49,7 @@ const player = {
   gravity: 1.2,
   jumpForce: -18,
   ground: canvas.height - 70,
-  drawW: 200,
+  drawW: 200,      // personaje más grande
   jumping: false
 };
 
@@ -84,10 +82,8 @@ function loop() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
   // DIBUJAR CAPAS DE FONDO
-  bgX = drawLayer(bgBack, bgX, 1);
-  mid1X = drawLayer(bgMid1, mid1X, 2);
-  mid2X = drawLayer(bgMid2, mid2X, 3);
-  fgX = drawLayer(fgFront, fgX, 4);
+  bgX = drawLayer(bgBack, bgX, 0.5);
+  mid1X = drawLayer(bgMid1, mid1X, 1);
 
   // FÍSICA
   player.vy += player.gravity;
@@ -110,7 +106,7 @@ function loop() {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if(timer > 8){ frame = (frame+1) % FRAMES; timer=0; } // más rápido
+    if(timer > 4){ frame = (frame+1) % FRAMES; timer=0; } // velocidad 4
     currentFrame = frame;
     jumpFrame=0;
   }
@@ -120,6 +116,7 @@ function loop() {
   const drawHScaled = img.height * scale;
   const drawY = player.y - drawHScaled;
 
+  // DIBUJAR AL PERSONAJE ENTRE mid1 y mid2
   ctx.drawImage(
     img,
     currentFrame * frameW,
@@ -132,7 +129,11 @@ function loop() {
     drawHScaled
   );
 
-  // TODO: aquí puedes dibujar obstáculos
+  // Continuar con capas más cercanas
+  mid2X = drawLayer(bgMid2, mid2X, 2);
+  fgX = drawLayer(fgFront, fgX, 3);
+
+  // TODO: dibujar obstáculos aquí
 
   requestAnimationFrame(loop);
 }
@@ -140,6 +141,10 @@ function loop() {
 // START
 runImg.onload = () => { player.y = player.ground; loop(); };
 </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
