@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Runner 0212 con Parallax y personaje más grande</title>
+<title>Runner 0212 con Parallax y Ancho Real</title>
 <style>
   body {
     margin: 0;
@@ -48,7 +48,7 @@ const player = {
   vy: 0,
   gravity: 1.2,
   jumpForce: -18,
-  ground: canvas.height - 40,
+  ground: canvas.height - 70,
   drawW: 200,      // personaje más grande
   jumping: false
 };
@@ -67,71 +67,65 @@ canvas.addEventListener("click", jump);
 // ====== ANIMACIÓN ======
 let frame = 0, timer = 0, jumpFrame = 0, jumpTimer = 0;
 
-// ====== CAPAS DE FONDO ======
+// ====== CAPAS DE FONDO (con ancho real) ======
 let bgX=0, mid1X=0, mid2X=0, fgX=0;
-function drawLayer(img, x, speed){
-  ctx.drawImage(img, x, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, x + canvas.width, 0, canvas.width, canvas.height);
+const bgBackWidth = bgBack.width;
+const bgMid1Width = bgMid1.width;
+const bgMid2Width = bgMid2.width;
+const fgFrontWidth = fgFront.width;
+
+function drawLayer(img, x, speed, width) {
+  ctx.drawImage(img, x, 0, width, canvas.height);
+  ctx.drawImage(img, x + width, 0, width, canvas.height);
   x -= speed;
-  if(x <= -canvas.width) x = 0;
+  if (x <= -width) x = 0;
   return x;
 }
 
 // ====== LOOP PRINCIPAL ======
 function loop() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // DIBUJAR CAPAS DE FONDO
-  bgX = drawLayer(bgBack, bgX, 1);
-  mid1X = drawLayer(bgMid1, mid1X, 3);
+  bgX = drawLayer(bgBack, bgX, 1, bgBackWidth);
+  mid1X = drawLayer(bgMid1, mid1X, 2, bgMid1Width);
 
-  // FÍSICA
+  // FÍSICA DEL JUGADOR
   player.vy += player.gravity;
   player.y += player.vy;
-  if(player.y >= player.ground){
+  if (player.y >= player.ground) {
     player.y = player.ground;
     player.vy = 0;
     player.jumping = false;
   }
 
-  // ANIMACIÓN
+  // ANIMACIÓN DEL JUGADOR
   let img, frameW, currentFrame;
-  if(player.jumping){
+  if (player.jumping) {
     img = jumpImg;
     frameW = img.width / JUMP_FRAMES;
     jumpTimer++;
-    if(jumpTimer > JUMP_SPEED){ jumpFrame = (jumpFrame + 1) % JUMP_FRAMES; jumpTimer=0; }
+    if (jumpTimer > JUMP_SPEED) { jumpFrame = (jumpFrame + 1) % JUMP_FRAMES; jumpTimer = 0; }
     currentFrame = jumpFrame;
   } else {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if(timer > 5){ frame = (frame+1) % FRAMES; timer=0; } // velocidad 4
+    if (timer > 5) { frame = (frame + 1) % FRAMES; timer = 0; }
     currentFrame = frame;
-    jumpFrame=0;
+    jumpFrame = 0;
   }
 
-  // ESCALA PROPORCIONAL
   const scale = player.drawW / frameW;
   const drawHScaled = img.height * scale;
   const drawY = player.y - drawHScaled;
 
   // DIBUJAR AL PERSONAJE ENTRE mid1 y mid2
-  ctx.drawImage(
-    img,
-    currentFrame * frameW,
-    0,
-    frameW,
-    img.height,
-    player.x,
-    drawY,
-    player.drawW,
-    drawHScaled
-  );
+  ctx.drawImage(img, currentFrame * frameW, 0, frameW, img.height, player.x, drawY, player.drawW, drawHScaled);
 
-  // Continuar con capas más cercanas
-  mid2X = drawLayer(bgMid2, mid2X, 3);
-  fgX = drawLayer(fgFront, fgX, 3.5);
+  // Capas más cercanas
+  mid2X = drawLayer(bgMid2, mid2X, 2, bgMid2Width);
+  fgX = drawLayer(fgFront, fgX, 3, fgFrontWidth);
 
   // TODO: dibujar obstáculos aquí
 
@@ -144,8 +138,3 @@ runImg.onload = () => { player.y = player.ground; loop(); };
 
 </body>
 </html>
-
-
-</body>
-</html>
-
