@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Runner 0212 Corregido</title>
+<title>Bebito Club - Runner Game</title>
 <style>
   body {
     margin: 0;
@@ -96,8 +96,8 @@ function loop() {
   ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
   ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
 
-  mid1AX -= 2.5;
-  mid1BX -= 2.5;
+  mid1AX -= 2.7;
+  mid1BX -= 2.7;
   if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
   if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
@@ -137,7 +137,7 @@ function loop() {
   // Midground2 con gap
   const mid2Width = getScaledWidth(bgMid2);
   ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
-  mid2X -= 2.5;
+  mid2X -= 2.7;
   if (mid2X <= -mid2Width - mid2Gap) mid2X = canvas.width + mid2Gap;
 
   // Foreground
