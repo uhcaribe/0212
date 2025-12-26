@@ -23,6 +23,10 @@
 <canvas id="game" width="800" height="400"></canvas>
 
 <script>
+// ====== CANVAS ======
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
 // ====== IMÁGENES ======
 const runImg = new Image(); runImg.src = './character/run.png';
 const jumpImg = new Image(); jumpImg.src = './character/jump.png';
@@ -39,9 +43,6 @@ const JUMP_FRAMES = 8;
 const JUMP_SPEED = 5;
 
 // ====== PLAYER ======
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
 const player = {
   x: 80,
   y: 0,
@@ -60,39 +61,35 @@ function jump() {
     player.jumping = true;
   }
 }
-window.addEventListener("keydown", e => { if(e.code === 'Space') jump(); });
+window.addEventListener("keydown", e => { if (e.code === 'Space') jump(); });
 canvas.addEventListener("click", jump);
 
 // ====== ANIMACIÓN ======
 let frame = 0, timer = 0, jumpFrame = 0, jumpTimer = 0;
 
-// ====== CAPAS DE FONDO ======
+// ====== POSICIONES ======
 let bgX = 0;
 let mid1AX = 0;
 let mid1BX = 0;
 let mid2X = 0;
-const mid2Gap = 400;
 let fgX = 0;
 
-// Escalado proporcional por altura
-function getScaledWidth(img) {
-  const scale = canvas.height / img.height;
-  return img.width * scale;
-}
+const mid2Gap = 400;
 
-// ====== LOOP PRINCIPAL ======
+// ====== DIMENSIONES ESCALADAS ======
+let bgWidth, mid1Width, mid2Width, fgWidth;
+
+// ====== LOOP ======
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Background
-  const bgWidth = getScaledWidth(bgBack);
   ctx.drawImage(bgBack, bgX, 0, bgWidth, canvas.height);
   ctx.drawImage(bgBack, bgX + bgWidth, 0, bgWidth, canvas.height);
   bgX -= 1;
   if (bgX <= -bgWidth) bgX = 0;
 
-  // Midground1A y Midground1B
-  const mid1Width = getScaledWidth(mid1A);
+  // Midground 1 A + B
   ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
   ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
 
@@ -101,7 +98,7 @@ function loop() {
   if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
   if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
-  // FÍSICA DEL JUGADOR
+  // Player physics
   player.vy += player.gravity;
   player.y += player.vy;
   if (player.y >= player.ground) {
@@ -110,38 +107,49 @@ function loop() {
     player.jumping = false;
   }
 
-  // ANIMACIÓN DEL JUGADOR
+  // Player animation
   let img, frameW, currentFrame;
   if (player.jumping) {
     img = jumpImg;
     frameW = img.width / JUMP_FRAMES;
     jumpTimer++;
-    if (jumpTimer > JUMP_SPEED) { jumpFrame = (jumpFrame + 1) % JUMP_FRAMES; jumpTimer = 0; }
+    if (jumpTimer > JUMP_SPEED) {
+      jumpFrame = (jumpFrame + 1) % JUMP_FRAMES;
+      jumpTimer = 0;
+    }
     currentFrame = jumpFrame;
   } else {
     img = runImg;
     frameW = img.width / FRAMES;
     timer++;
-    if (timer > 5) { frame = (frame + 1) % FRAMES; timer = 0; }
+    if (timer > 5) {
+      frame = (frame + 1) % FRAMES;
+      timer = 0;
+    }
     currentFrame = frame;
     jumpFrame = 0;
   }
 
   const scale = player.drawW / frameW;
-  const drawHScaled = img.height * scale;
-  const drawY = player.y - drawHScaled;
+  const drawH = img.height * scale;
+  const drawY = player.y - drawH;
 
-  // DIBUJAR AL PERSONAJE ENTRE mid1 Y mid2
-  ctx.drawImage(img, currentFrame * frameW, 0, frameW, img.height, player.x, drawY, player.drawW, drawHScaled);
+  ctx.drawImage(
+    img,
+    currentFrame * frameW, 0,
+    frameW, img.height,
+    player.x, drawY,
+    player.drawW, drawH
+  );
 
-  // Midground2 con gap
-  const mid2Width = getScaledWidth(bgMid2);
+  // Midground 2 con gap
   ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
   mid2X -= 2.7;
-  if (mid2X <= -mid2Width - mid2Gap) mid2X = canvas.width + mid2Gap;
+  if (mid2X <= -mid2Width - mid2Gap) {
+    mid2X = canvas.width + mid2Gap;
+  }
 
   // Foreground
-  const fgWidth = getScaledWidth(fgFront);
   ctx.drawImage(fgFront, fgX, 0, fgWidth, canvas.height);
   ctx.drawImage(fgFront, fgX + fgWidth, 0, fgWidth, canvas.height);
   fgX -= 4;
@@ -150,9 +158,10 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-// ====== ESPERAR CARGA DE TODAS LAS IMÁGENES ======
+// ====== CARGA ======
 const images = [runImg, jumpImg, bgBack, mid1A, mid1B, bgMid2, fgFront];
 let loaded = 0;
+
 images.forEach(img => {
   img.onload = () => {
     loaded++;
@@ -161,14 +170,22 @@ images.forEach(img => {
 });
 
 function startGame() {
+  // Escalar una sola vez
+  bgWidth = bgBack.width * (canvas.height / bgBack.height);
+  mid1Width = mid1A.width * (canvas.height / mid1A.height);
+  mid2Width = bgMid2.width * (canvas.height / bgMid2.height);
+  fgWidth = fgFront.width * (canvas.height / fgFront.height);
+
   player.y = player.ground;
   mid1AX = 0;
-  mid1BX = getScaledWidth(mid1A);
+  mid1BX = mid1Width;
   mid2X = canvas.width;
+
   loop();
 }
 </script>
 
 </body>
 </html>
+
 
