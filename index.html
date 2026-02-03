@@ -93,8 +93,8 @@ function loop() {
   ctx.drawImage(mid1A, mid1AX, 0, mid1Width, canvas.height);
   ctx.drawImage(mid1B, mid1BX, 0, mid1Width, canvas.height);
 
-  mid1AX -= 3;
-  mid1BX -= 3;
+  mid1AX -= 4;
+  mid1BX -= 4;
   if (mid1AX <= -mid1Width) mid1AX = mid1BX + mid1Width;
   if (mid1BX <= -mid1Width) mid1BX = mid1AX + mid1Width;
 
@@ -144,7 +144,7 @@ function loop() {
 
   // Midground 2 con gap
   ctx.drawImage(bgMid2, mid2X, 0, mid2Width, canvas.height);
-  mid2X -= 3;
+  mid2X -= 4;
   if (mid2X <= -mid2Width - mid2Gap) {
     mid2X = canvas.width + mid2Gap;
   }
@@ -152,7 +152,7 @@ function loop() {
   // Foreground
   ctx.drawImage(fgFront, fgX, 0, fgWidth, canvas.height);
   ctx.drawImage(fgFront, fgX + fgWidth, 0, fgWidth, canvas.height);
-  fgX -= 4;
+  fgX -= 5;
   if (fgX <= -fgWidth) fgX = 0;
 
   requestAnimationFrame(loop);
